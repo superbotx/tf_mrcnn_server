@@ -56,5 +56,6 @@ pip-delete-this-directory.txt
 .venv
 venv/
 ENV/
+venv3/
 
 .DS_Store
