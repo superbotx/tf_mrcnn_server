@@ -11,6 +11,7 @@ import jsonpickle
 import cv2
 import skimage.io
 from PIL import Image
+import base64
 
 ROOT_DIR = os.path.abspath("../")
 
@@ -67,8 +68,25 @@ image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
 def detect():
     global model, image
     r = request
-    nparr = np.fromstring(r.data, np.uint8)
+    print ("r", r)
+    print ("r.values", r.values)
+    # print ("r.data", r.data)
+    print("r.data length: ", len(r.data))
+
+    # byte_image = r.data.encode('utf-8')
+    decoded_image = base64.decodebytes(r.data)
+    print("decoded image size: ", len(decoded_image))
+    nparr = np.fromstring(decoded_image, np.uint8)
+
     cv2_img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    cv2.imshow("image", cv2_img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+    # nparr = np.fromstring(r.data, np.uint8)
+    # cv2_img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
     img_arr = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
     img = Image.fromarray(img_arr)
     img.save("tmp.jpg")
@@ -85,8 +103,8 @@ def detect():
     results = model.detect([img_np], verbose=1)
     r = results[0]
     print(r)
-    response_pickled = jsonpickle.encode(r)
-    return Response(response=response_pickled, status=200, mimetype="application/json")
+    # response_pickled = jsonpickle.encode(r)
+    return Response(response=r, status=200, mimetype="application/json")
 
 if __name__ == '__main__':
     app.run(host="localhost", port=5000)
