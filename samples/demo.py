@@ -14,6 +14,7 @@ from PIL import Image
 import base64
 import json
 import pickle
+import json_tricks
 
 ROOT_DIR = os.path.abspath("../")
 
@@ -70,20 +71,15 @@ image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
 def detect():
     global model, image
     r = request
-    print ("r", r)
-    print ("r.values", r.values)
-    # print ("r.data", r.data)
-    print("r.data length: ", len(r.data))
 
-    # byte_image = r.data.encode('utf-8')
     decoded_image = base64.decodebytes(r.data)
     print("decoded image size: ", len(decoded_image))
     nparr = np.fromstring(decoded_image, np.uint8)
-
     cv2_img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    cv2.imshow("image", cv2_img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+
+    # cv2.imshow("image", cv2_img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
 
     # nparr = np.fromstring(r.data, np.uint8)
@@ -105,21 +101,11 @@ def detect():
     results = model.detect([img_np], verbose=1)
     r = results[0]
     print(r)
-    print(type(r))
-    # r = json.dumps(r)
-    # r = pickle.dumps(r)
-    # r2 = pickle.loads(r)
-    r = jsonpickle.encode(r, unpicklable=False)
-    r2 = json.loads(r)
-    print(r2)
-    # r2 = jsonpickle.decode(r2)
-    # print(r2)
 
-    # r2 = jsonpickle.decode(r)
-    # if r == r2:
-    #   print("Decoded successfully.")
-    # else:
-    #   print("Decoding error.")
+    output_image = visualize.display_instances(img_np, r['rois'], r['masks'], r['class_ids'], class_names, r['scores'])
+
+    r = json_tricks.dumps(r)
+
     return Response(response=r, status=200, mimetype="application/json")
 
 if __name__ == '__main__':
