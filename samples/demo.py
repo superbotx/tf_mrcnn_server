@@ -107,14 +107,19 @@ def detect():
     print(r)
     print(type(r))
     # r = json.dumps(r)
-    r = pickle.dumps(r)
-    r2 = pickle.loads(r)
-    # r = jsonpickle.encode(r)
+    # r = pickle.dumps(r)
+    # r2 = pickle.loads(r)
+    r = jsonpickle.encode(r, unpicklable=False)
+    r2 = json.loads(r)
+    print(r2)
+    # r2 = jsonpickle.decode(r2)
+    # print(r2)
+
     # r2 = jsonpickle.decode(r)
-    if r == r2:
-      print("Decoded successfully.")
-    else:
-      print("Decoding error.")
+    # if r == r2:
+    #   print("Decoded successfully.")
+    # else:
+    #   print("Decoding error.")
     return Response(response=r, status=200, mimetype="application/json")
 
 if __name__ == '__main__':
