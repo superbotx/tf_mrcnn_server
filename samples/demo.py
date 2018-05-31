@@ -12,6 +12,8 @@ import cv2
 import skimage.io
 from PIL import Image
 import base64
+import json
+import pickle
 
 ROOT_DIR = os.path.abspath("../")
 
@@ -103,7 +105,16 @@ def detect():
     results = model.detect([img_np], verbose=1)
     r = results[0]
     print(r)
-    # response_pickled = jsonpickle.encode(r)
+    print(type(r))
+    # r = json.dumps(r)
+    r = pickle.dumps(r)
+    r2 = pickle.loads(r)
+    # r = jsonpickle.encode(r)
+    # r2 = jsonpickle.decode(r)
+    if r == r2:
+      print("Decoded successfully.")
+    else:
+      print("Decoding error.")
     return Response(response=r, status=200, mimetype="application/json")
 
 if __name__ == '__main__':
